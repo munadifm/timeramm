@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timer Gema Takbir</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Lato', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+	background-image: url('https://i.imgur.com/hGMxJZp.png'); /* Replace 'background.jpg' with your image file */
+        background-size: cover; /* This will make sure the background image covers the entire screen */
+	color: darkblue; /* Set font color to white */
+    }
+    #timer {
+        font-size: 120px;
+        margin-bottom: 20px;
+    }
+    .blink {
+        animation: blinker 1s linear infinite;
+    }
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+    #buttons {
+        margin-bottom: 20px;
+    }
+    #history {
+        text-align: center;
+    }
+    button {
+        margin-right: 10px;
+	font-size: 24px; /* Increase the font size of the buttons */
+        padding: 8px 15px; /* Increase padding to increase the button size */
+    }
+</style>
+</head>
+<body>
+
+<div id="timer" class="blink">00:05:00</div>
+<div id="buttons" style="margin-top:12px;">
+    
+    <button onclick="startTimer()">Start</button>
+    <button onclick="stopTimer()">Stop</button>
+    <button onclick="resetTimer()">Reset</button>
+    <button onclick="clearHistory()">Clear History</button>
+    
+</div>
+<div id="history"></div>
+
+<script>
+let interval;
+let timerRunning = false;
+let timerValue = 300; // 5 minutes in seconds
+const timerDisplay = document.getElementById('timer');
+const historyDisplay = document.getElementById('history');
+
+function startTimer() {
+    if (!timerRunning) {
+        interval = setInterval(updateTimer, 1000);
+        timerRunning = true;
+    }
+}
+
+function stopTimer() {
+    clearInterval(interval);
+    timerRunning = false;
+    saveHistory(timerValue);
+}
+
+function resetTimer() {
+    clearInterval(interval);
+    timerRunning = false;
+    timerValue = 300;
+    updateTimerDisplay();
+}
+
+function updateTimer() {
+    if (timerValue > 0) {
+        timerValue--;
+        updateTimerDisplay();
+        if (timerValue <= 30) {
+            timerDisplay.classList.add('blink');
+        } else {
+            timerDisplay.classList.remove('blink');
+        }
+    } else {
+        clearInterval(interval);
+        timerRunning = false;
+        saveHistory(0);
+    }
+}
+
+function updateTimerDisplay() {
+    const hours = Math.floor(timerValue / 3600);
+    const minutes = Math.floor((timerValue % 3600) / 60);
+    const seconds = timerValue % 60;
+    timerDisplay.textContent = `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+}
+
+function padZero(num) {
+    return (num < 10) ? `0${num}` : num;
+}
+
+function saveHistory(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    const historyItem = document.createElement('div');
+    historyItem.textContent = `${getHistoryNumber()}. Stopped at: ${padZero(minutes)}:${padZero(seconds)}`;
+    historyDisplay.appendChild(historyItem);
+}
+
+function clearHistory() {
+    historyDisplay.innerHTML = "";
+}
+
+function getHistoryNumber() {
+    return historyDisplay.childElementCount + 1;
+}
+</script>
+
+</body>
+</html>
